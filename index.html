@@ -2,220 +2,317 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>AI 사진 메모</title>
 <style>
   :root {
-    --bg: #f4f5fb;
+    --bg-top: #eef0fb;
+    --bg-bottom: #f7f4fd;
     --card: #ffffff;
     --primary: #4f46e5;
     --primary-dark: #4338ca;
     --accent: #9333ea;
-    --text: #1f2333;
-    --muted: #6b7280;
-    --border: #e5e7eb;
+    --text: #1b1e2b;
+    --muted: #8083a0;
+    --border: #ecedf6;
     --danger: #dc2626;
+    --success: #16a34a;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+  }
   body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     color: var(--text);
+    -webkit-font-smoothing: antialiased;
   }
   .wrap {
-    max-width: 480px;
+    max-width: 440px;
     margin: 0 auto;
     min-height: 100vh;
-    padding: 24px 20px 60px;
+    padding: max(28px, env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
   }
   header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
   header .logo {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 10px;
-    border-radius: 18px;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 14px;
+    border-radius: 16px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
   }
+  header .logo svg { width: 28px; height: 28px; }
   header h1 {
-    font-size: 20px;
+    font-size: 19px;
+    font-weight: 700;
     margin: 0;
+    letter-spacing: -0.2px;
   }
   header p {
     color: var(--muted);
     font-size: 13px;
     margin: 6px 0 0;
+    line-height: 1.5;
   }
+
+  main { flex: 1; display: flex; flex-direction: column; }
+
   .card {
     background: var(--card);
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 4px 18px rgba(30, 30, 60, 0.06);
-    margin-bottom: 16px;
+    border-radius: 20px;
+    padding: 26px 22px;
+    box-shadow: 0 10px 30px rgba(30, 30, 70, 0.06);
+    border: 1px solid rgba(255,255,255,0.6);
   }
   .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* PIN 화면 */
-  #pinScreen input {
-    width: 100%;
-    font-size: 28px;
-    letter-spacing: 14px;
+  /* ---- PIN 화면 ---- */
+  #pinScreen { margin: auto 0; }
+  #pinScreen .pin-title {
     text-align: center;
-    padding: 14px 0;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .pin-boxes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .pin-boxes input {
+    width: 52px;
+    height: 60px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
     border: 2px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 14px;
+    border-radius: 14px;
+    background: #fafaff;
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .pin-boxes input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #fff;
   }
   #pinError {
     color: var(--danger);
-    font-size: 13px;
+    font-size: 12.5px;
     text-align: center;
-    margin-bottom: 10px;
+    margin: -6px 0 14px;
+    min-height: 16px;
   }
 
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-  }
+  button { font-family: inherit; cursor: pointer; border: none; }
   .btn-primary {
     width: 100%;
     padding: 16px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     color: #fff;
-    font-size: 16px;
+    font-size: 15.5px;
     font-weight: 600;
     border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+    transition: transform 0.1s, opacity 0.15s;
   }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:disabled { opacity: 0.55; }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.5; box-shadow: none; }
   .btn-secondary {
     width: 100%;
     padding: 14px;
-    background: #eef0fb;
+    background: #f2f2fb;
     color: var(--primary-dark);
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 600;
     border-radius: 14px;
     margin-top: 10px;
+    transition: transform 0.1s;
   }
+  .btn-secondary:active { transform: scale(0.97); }
 
+  /* ---- 촬영 화면 ---- */
   .camera-btn {
     width: 100%;
-    padding: 40px 16px;
-    border: 2px dashed #c7c9e8;
-    border-radius: 16px;
+    padding: 46px 16px;
+    border: 1.5px dashed #cfd2ef;
+    border-radius: 18px;
     background: #f8f9ff;
     text-align: center;
     color: var(--primary-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .camera-btn .icon { font-size: 40px; display: block; margin-bottom: 8px; }
-  .camera-btn .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .camera-btn:active { background: #f0f1ff; border-color: var(--primary); }
+  .camera-btn .icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .camera-btn .icon-circle svg { width: 26px; height: 26px; }
+  .camera-btn .label { font-size: 15px; font-weight: 600; }
+  .camera-btn .sub { font-size: 12px; color: var(--muted); }
 
-  #preview {
-    width: 100%;
-    border-radius: 14px;
-    margin-bottom: 14px;
+  .preview-frame {
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 18px rgba(30,30,70,0.10);
+    background: #eee;
+  }
+  #preview { width: 100%; display: block; }
+
+  label.field-label {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 7px;
     display: block;
+    font-weight: 600;
   }
   textarea {
     width: 100%;
-    min-height: 60px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
+    min-height: 58px;
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    padding: 12px 13px;
     font-size: 14px;
     font-family: inherit;
     resize: vertical;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    background: #fafaff;
+    transition: border-color 0.15s;
   }
-  label.field-label {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: block;
-  }
+  textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
 
-  .status {
-    text-align: center;
-    padding: 30px 10px;
-  }
+  /* ---- 상태 화면 ---- */
+  .status { text-align: center; padding: 34px 6px 6px; }
   .status .spinner {
-    width: 34px;
-    height: 34px;
-    border: 4px solid #e5e7eb;
+    width: 38px;
+    height: 38px;
+    border: 4px solid #e7e8f5;
     border-top-color: var(--primary);
     border-radius: 50%;
-    margin: 0 auto 16px;
+    margin: 0 auto 20px;
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .status .big-check {
-    font-size: 44px;
-    margin-bottom: 10px;
+  .status .icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .status h3 { margin: 0 0 6px; font-size: 17px; }
+  .status .icon-wrap svg { width: 30px; height: 30px; }
+  .status .icon-wrap.success { background: #e9f9ef; }
+  .status .icon-wrap.error { background: #fdeceb; }
+  .status h3 { margin: 0 0 8px; font-size: 16.5px; font-weight: 700; }
   .status p { color: var(--muted); font-size: 13px; margin: 0; line-height: 1.6; }
 
   .footer-note {
     text-align: center;
-    color: var(--muted);
+    color: #b3b5cc;
     font-size: 11px;
-    margin-top: 20px;
+    margin-top: 26px;
+    letter-spacing: 0.2px;
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">📷</div>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 8.5C4 7.67 4.67 7 5.5 7H8L9 5.5H15L16 7H18.5C19.33 7 20 7.67 20 8.5V17.5C20 18.33 19.33 19 18.5 19H5.5C4.67 19 4 18.33 4 17.5V8.5Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="12" cy="13" r="3.2" stroke="white" stroke-width="1.6"/>
+      </svg>
+    </div>
     <h1>AI 사진 메모</h1>
-    <p>사진을 찍으면 AI가 정리해서 카카오톡으로 보내드려요</p>
+    <p>사진을 찍으면 AI가 정리해서<br>카카오톡으로 보내드려요</p>
   </header>
 
-  <!-- 1) PIN 입력 화면 -->
-  <div id="pinScreen" class="card">
-    <label class="field-label">비밀번호 4자리</label>
-    <input type="tel" id="pinInput" maxlength="4" inputmode="numeric" placeholder="••••" autofocus>
-    <div id="pinError" class="hidden">비밀번호가 틀렸어요. 다시 입력해주세요.</div>
-    <button class="btn-primary" onclick="checkPin()">확인</button>
-  </div>
-
-  <!-- 2) 메인 화면 -->
-  <div id="mainScreen" class="card hidden">
-    <div id="captureArea">
-      <input type="file" accept="image/*" capture="environment" id="fileInput" class="hidden">
-      <button class="camera-btn" onclick="document.getElementById('fileInput').click()">
-        <span class="icon">📸</span>
-        사진 촬영하기
-        <div class="sub">눌러서 카메라를 바로 여세요</div>
-      </button>
+  <main>
+    <!-- 1) PIN 입력 화면 -->
+    <div id="pinScreen">
+      <div class="card">
+        <div class="pin-title">비밀번호 4자리를 입력해주세요</div>
+        <div class="pin-boxes">
+          <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" data-idx="0">
+          <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" data-idx="1">
+          <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" data-idx="2">
+          <input type="tel" inputmode="numeric" maxlength="1" class="pin-digit" data-idx="3">
+        </div>
+        <div id="pinError"></div>
+        <button class="btn-primary" onclick="checkPin()">확인</button>
+      </div>
     </div>
 
-    <div id="previewArea" class="hidden">
-      <img id="preview" alt="미리보기">
-      <label class="field-label">메모 (선택사항)</label>
-      <textarea id="noteInput" placeholder="예: 3층 회의실, 거래처 명함 등 참고할 내용을 적어주세요"></textarea>
-      <button class="btn-primary" id="sendBtn" onclick="sendPhoto()">AI 분석 + 카톡으로 받기</button>
-      <button class="btn-secondary" onclick="resetForm()">다시 찍기</button>
-    </div>
+    <!-- 2) 메인 화면 -->
+    <div id="mainScreen" class="hidden">
+      <div class="card" id="captureArea">
+        <input type="file" accept="image/*" capture="environment" id="fileInput" class="hidden">
+        <button class="camera-btn" onclick="document.getElementById('fileInput').click()">
+          <span class="icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 8.5C4 7.67 4.67 7 5.5 7H8L9 5.5H15L16 7H18.5C19.33 7 20 7.67 20 8.5V17.5C20 18.33 19.33 19 18.5 19H5.5C4.67 19 4 18.33 4 17.5V8.5Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+              <circle cx="12" cy="13" r="3.2" stroke="white" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <span class="label">사진 촬영하기</span>
+          <span class="sub">눌러서 카메라를 바로 열어요</span>
+        </button>
+      </div>
 
-    <div id="statusArea" class="hidden status">
-      <div id="statusSpinner" class="spinner"></div>
-      <div id="statusIcon" class="big-check hidden">✅</div>
-      <h3 id="statusTitle">전송 중이에요...</h3>
-      <p id="statusText">잠시만 기다려주세요.</p>
-      <button class="btn-secondary hidden" id="resetBtn" onclick="resetForm()">새 사진 찍기</button>
+      <div id="previewArea" class="card hidden">
+        <div class="preview-frame"><img id="preview" alt="미리보기"></div>
+        <label class="field-label">메모 (선택사항)</label>
+        <textarea id="noteInput" placeholder="예: 3층 회의실, 거래처 명함 등 참고할 내용을 적어주세요"></textarea>
+        <button class="btn-primary" id="sendBtn" onclick="sendPhoto()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12L20 4L14 20L11 13L4 12Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          AI 분석 + 카톡으로 받기
+        </button>
+        <button class="btn-secondary" onclick="resetForm()">다시 찍기</button>
+      </div>
+
+      <div id="statusArea" class="card hidden status">
+        <div id="statusSpinner" class="spinner"></div>
+        <div id="statusIconWrap" class="icon-wrap hidden">
+          <svg id="statusIconSvg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <h3 id="statusTitle">전송 중이에요...</h3>
+        <p id="statusText">잠시만 기다려주세요.</p>
+        <button class="btn-secondary hidden" id="resetBtn" onclick="resetForm()" style="margin-top:20px;">새 사진 찍기</button>
+      </div>
     </div>
-  </div>
+  </main>
 
   <div class="footer-note">사장님 전용 · AI 사진 메모</div>
 </div>
@@ -227,27 +324,56 @@
   var MAX_WIDTH = 1600;
   var currentDataUrl = null;
 
+  var ICONS = {
+    success: '<path d="M5 13l4 4L19 7" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    error: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a1.7 1.7 0 001.5 2.5h15.6a1.7 1.7 0 001.5-2.5L13.7 3.9a1.7 1.7 0 00-3.4 0z" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+
   // ---- PIN 화면 ----
+  var pinInputs = document.querySelectorAll('.pin-digit');
+  pinInputs.forEach(function (inp, i) {
+    inp.addEventListener('input', function () {
+      inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (inp.value && i < pinInputs.length - 1) {
+        pinInputs[i + 1].focus();
+      }
+      if (i === pinInputs.length - 1 && inp.value) {
+        var all = Array.prototype.map.call(pinInputs, function (x) { return x.value; }).join('');
+        if (all.length === 4) checkPin();
+      }
+    });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !inp.value && i > 0) {
+        pinInputs[i - 1].focus();
+      }
+    });
+  });
+
   function checkPin() {
-    var val = document.getElementById('pinInput').value.trim();
+    var val = Array.prototype.map.call(pinInputs, function (x) { return x.value; }).join('');
     if (val === CORRECT_PIN) {
       localStorage.setItem('ai_photo_memo_pin_ok', 'yes');
       showMain();
     } else {
-      document.getElementById('pinError').classList.remove('hidden');
+      document.getElementById('pinError').textContent = '비밀번호가 틀렸어요. 다시 입력해주세요.';
+      pinInputs.forEach(function (x) { x.value = ''; });
+      pinInputs[0].focus();
     }
   }
+
   document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('pinInput').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') checkPin();
-    });
     if (localStorage.getItem('ai_photo_memo_pin_ok') === 'yes') {
       showMain();
+    } else {
+      pinInputs[0].focus();
     }
   });
+
   function showMain() {
     document.getElementById('pinScreen').classList.add('hidden');
-    document.getElementById('mainScreen').classList.remove('hidden');
+    var m = document.getElementById('mainScreen');
+    m.classList.remove('hidden');
+    m.classList.add('fade-in');
   }
 
   // ---- 사진 선택 및 리사이즈 ----
@@ -268,7 +394,9 @@
         currentDataUrl = canvas.toDataURL('image/jpeg', 0.82);
         document.getElementById('preview').src = currentDataUrl;
         document.getElementById('captureArea').classList.add('hidden');
-        document.getElementById('previewArea').classList.remove('hidden');
+        var p = document.getElementById('previewArea');
+        p.classList.remove('hidden');
+        p.classList.add('fade-in');
       };
       img.src = ev.target.result;
     };
@@ -280,10 +408,18 @@
     document.getElementById('fileInput').value = '';
     document.getElementById('noteInput').value = '';
     document.getElementById('captureArea').classList.remove('hidden');
-    document.getElementById('previewArea').classList.remove('hidden');
     document.getElementById('previewArea').classList.add('hidden');
     document.getElementById('statusArea').classList.add('hidden');
     document.getElementById('sendBtn').disabled = false;
+  }
+
+  function setStatusIcon(type) {
+    var wrap = document.getElementById('statusIconWrap');
+    var svg = document.getElementById('statusIconSvg');
+    wrap.classList.remove('success', 'error');
+    wrap.classList.add(type);
+    svg.innerHTML = ICONS[type];
+    wrap.classList.remove('hidden');
   }
 
   // ---- 전송 ----
@@ -291,9 +427,11 @@
     if (!currentDataUrl) return;
     document.getElementById('sendBtn').disabled = true;
     document.getElementById('previewArea').classList.add('hidden');
-    document.getElementById('statusArea').classList.remove('hidden');
+    var statusArea = document.getElementById('statusArea');
+    statusArea.classList.remove('hidden');
+    statusArea.classList.add('fade-in');
     document.getElementById('statusSpinner').classList.remove('hidden');
-    document.getElementById('statusIcon').classList.add('hidden');
+    document.getElementById('statusIconWrap').classList.add('hidden');
     document.getElementById('statusTitle').textContent = '전송 중이에요...';
     document.getElementById('statusText').textContent = 'AI가 분석해서 곧 카카오톡으로 보내드릴게요.';
     document.getElementById('resetBtn').classList.add('hidden');
@@ -312,14 +450,13 @@
       body: JSON.stringify(payload)
     }).then(function () {
       document.getElementById('statusSpinner').classList.add('hidden');
-      document.getElementById('statusIcon').classList.remove('hidden');
+      setStatusIcon('success');
       document.getElementById('statusTitle').textContent = '전송 완료!';
-      document.getElementById('statusText').textContent = '10~20초 후 카카오톡 "나와의 채팅"으로 정리된 내용이 도착해요.';
+      document.getElementById('statusText').textContent = '10~20초 후 카카오톡 "나와의 채팅"으로\n정리된 내용이 도착해요.';
       document.getElementById('resetBtn').classList.remove('hidden');
     }).catch(function () {
       document.getElementById('statusSpinner').classList.add('hidden');
-      document.getElementById('statusIcon').textContent = '⚠️';
-      document.getElementById('statusIcon').classList.remove('hidden');
+      setStatusIcon('error');
       document.getElementById('statusTitle').textContent = '전송 실패';
       document.getElementById('statusText').textContent = '인터넷 연결을 확인하고 다시 시도해주세요.';
       document.getElementById('resetBtn').classList.remove('hidden');
