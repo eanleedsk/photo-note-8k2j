@@ -320,6 +320,14 @@
   <div class="footer-note">직원용 · AI 사진 메모</div>
 </div>
 
+<iframe name="uploadFrame" id="uploadFrame" style="display:none"></iframe>
+<form id="uploadForm" method="POST" target="uploadFrame" style="display:none">
+  <input type="hidden" name="session" id="f_session">
+  <input type="hidden" name="image" id="f_image">
+  <input type="hidden" name="mimeType" id="f_mimeType" value="image/jpeg">
+  <input type="hidden" name="note" id="f_note">
+</form>
+
 <script>
   var EXEC_URL = 'https://script.google.com/macros/s/AKfycbz7MeYcMImhHO_UqJ3GjdM7wjjVnEy6kYQroy4pSpccqvD89ql1X04wnnzROPl_7Xz1/exec';
   var KAKAO_REST_KEY = '70a6c00e71420820dd2b1e044d597f9d';
@@ -425,32 +433,42 @@
     document.getElementById('statusText').textContent = 'AI가 분석해서 곧 카카오톡으로 보내드릴게요.';
     document.getElementById('resetBtn').classList.add('hidden');
 
-    var payload = {
-      session: localStorage.getItem('ai_photo_memo_session') || '',
-      image: currentDataUrl,
-      mimeType: 'image/jpeg',
-      note: document.getElementById('noteInput').value || ''
-    };
+    document.getElementById('f_session').value = localStorage.getItem('ai_photo_memo_session') || '';
+    document.getElementById('f_image').value = currentDataUrl;
+    document.getElementById('f_note').value = document.getElementById('noteInput').value || '';
 
-    fetch(EXEC_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    }).then(function () {
+    var finished = false;
+    function showSuccess() {
+      if (finished) return;
+      finished = true;
       document.getElementById('statusSpinner').classList.add('hidden');
       setStatusIcon('success');
       document.getElementById('statusTitle').textContent = '저장 접수 완료!';
       document.getElementById('statusText').textContent = '이 화면은 이제 닫으셔도 괜찮아요.\n잠시 후 카카오톡으로 도착해요.';
       document.getElementById('resetBtn').classList.remove('hidden');
-    }).catch(function () {
+    }
+    function showError() {
+      if (finished) return;
+      finished = true;
       document.getElementById('statusSpinner').classList.add('hidden');
       setStatusIcon('error');
       document.getElementById('statusTitle').textContent = '전송 실패';
       document.getElementById('statusText').textContent = '인터넷 연결을 확인하고 다시 시도해주세요.';
       document.getElementById('resetBtn').classList.remove('hidden');
       document.getElementById('sendBtn').disabled = false;
-    });
+    }
+
+    var frame = document.getElementById('uploadFrame');
+    frame.onload = showSuccess;
+    setTimeout(function () { if (!finished) showSuccess(); }, 12000);
+
+    var form = document.getElementById('uploadForm');
+    form.action = EXEC_URL;
+    try {
+      form.submit();
+    } catch (e) {
+      showError();
+    }
   }
 </script>
 </body>
