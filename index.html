@@ -323,7 +323,7 @@
 <script>
   var EXEC_URL = 'https://script.google.com/macros/s/AKfycbz7MeYcMImhHO_UqJ3GjdM7wjjVnEy6kYQroy4pSpccqvD89ql1X04wnnzROPl_7Xz1/exec';
   var KAKAO_REST_KEY = '70a6c00e71420820dd2b1e044d597f9d';
-  var MAX_WIDTH = 1600;
+  var MAX_WIDTH = 2200;
   var currentDataUrl = null;
 
   var ICONS = {
@@ -380,7 +380,7 @@
         canvas.width = w;
         canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        currentDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        currentDataUrl = canvas.toDataURL('image/jpeg', 0.92);
         document.getElementById('preview').src = currentDataUrl;
         document.getElementById('captureArea').classList.add('hidden');
         var p = document.getElementById('previewArea');
